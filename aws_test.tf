@@ -9,6 +9,12 @@ resource "aws_instance" "linux" {
   }
 }
 
+data "template_file" "installation_template" {
+  template = "${file("install.tpl")}"
+  vars = {
+    efs_dns = "www.example.com"
+  }
+}
 
 
 
