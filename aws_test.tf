@@ -18,6 +18,15 @@ resource "aws_instance" "linuxbox2" {
   lifecycle {
     create_before_destroy = true
   }
+  provisioner "file" {
+    source      = "configs/ssl-params.conf"
+    destination = "/tmp/ssl-params.conf"
+    connection {
+      type     = "ssh"
+      user     = "ubuntu"
+      host     = self.public_ip
+    }
+  }
 }
 
 
