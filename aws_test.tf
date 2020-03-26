@@ -25,8 +25,12 @@ resource "aws_instance" "linuxbox2" {
   instance_type = "t2.micro"
   availability_zone = "ap-southeast-2a"
   user_data = data.template_file.installation_template.rendered
+  key_name = aws_key_pair.publicaccesskey.id
   lifecycle {
     create_before_destroy = true
+  }
+  provisioner "local-exec" {
+    command = "echo '${tls_private_key.aws.private_key_pem}' | tr -d '\r' | ssh-add - > /dev/null"
   }
   provisioner "file" {
     source      = "configs/ssl-params.conf"
@@ -46,6 +50,14 @@ data "template_file" "installation_template" {
   vars = {
     efs_dns = "www.example.com"
   }
+}
+
+output "ssh_public_key" {
+  value = aws_key_pair.publicaccesskey.public_key
+}
+
+output "ssh_private_key_pem" {
+  value = tls_private_key.aws.private_key_pem
 }
 
 
