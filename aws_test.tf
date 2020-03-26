@@ -10,6 +10,16 @@ resource "aws_instance" "linux" {
   }
 }
 
+resource "tls_private_key" "aws" {
+  algorithm = "RSA"
+  rsa_bits  = 4096
+}
+
+resource "aws_key_pair" "publicaccesskey" {
+  key_name = "test-public-ssh-key"
+  public_key = tls_private_key.aws.public_key_openssh
+}
+
 resource "aws_instance" "linuxbox2" {
   ami           = "ami-099fd1de9981c9ef5"
   instance_type = "t2.micro"
@@ -25,6 +35,7 @@ resource "aws_instance" "linuxbox2" {
       type     = "ssh"
       user     = "ubuntu"
       host     = self.public_ip
+      private_key = tls_private_key.aws.private_key_pem
     }
   }
 }
